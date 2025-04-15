@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './InventoryPage.css';
 import axios from 'axios' ;
-const API_BASE_URL = 'https://marbleworldinventory.onrender.com';
+const API_BASE_URL = 'https://marbleworldinventory.onrender.com/inventory';
 const InventoryPage = () => {
   const [materials, setMaterials] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -61,8 +61,9 @@ const InventoryPage = () => {
   };
 
   const handleDownloadTemplate = () => {
-    window.open('https://marbleworldinventory.replit.app/materials_template.xlsx', '_blank');
+  window.open('https://marbleworldinventory.onrender.com/materials_template.xlsx', '_blank');
   };
+
 
   const handleUploadTemplate = (e) => {
     const file = e.target.files[0];
