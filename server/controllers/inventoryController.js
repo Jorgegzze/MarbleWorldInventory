@@ -1,3 +1,4 @@
+
 const fs = require('fs');
 const path = require('path');
 const xlsx = require('xlsx');
@@ -22,9 +23,7 @@ exports.uploadInventory = async (req, res) => {
     const filePath = path.join(__dirname, '..', req.file.path);
     const workbook = xlsx.readFile(filePath);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const data = xlsx.utils.sheet_to_json(sheet);
-
-    await pool.query('DELETE FROM inventory');
+    const data = xlsx.utils.sheet_to_json(sheet, { defval: '' }); // row 1 = headers
 
     for (const row of data) {
       const {
@@ -39,7 +38,7 @@ exports.uploadInventory = async (req, res) => {
         Image: image
       } = row;
 
-      const status = quantity === 0 ? 'Out of Stock' : 'Available';
+      const status = parseInt(quantity) === 0 ? 'Out of Stock' : 'Available';
 
       await pool.query(
         'INSERT INTO inventory (material_id, name, category, finish, presentation, dimensions, price, quantity, image, status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
@@ -63,5 +62,33 @@ exports.deleteInventory = async (req, res) => {
     res.json({ message: 'Items deleted' });
   } catch (error) {
     res.status(500).json({ error: 'Error deleting inventory' });
+  }
+};
+
+exports.uploadSingleMaterial = async (req, res) => {
+  try {
+    const {
+      material_id,
+      name,
+      category,
+      finish,
+      presentation,
+      dimensions,
+      price,
+      quantity
+    } = req.body;
+
+    const image = req.file ? `/uploads/${req.file.filename}` : '';
+    const status = parseInt(quantity) === 0 ? 'Out of Stock' : 'Available';
+
+    await pool.query(
+      'INSERT INTO inventory (material_id, name, category, finish, presentation, dimensions, price, quantity, image, status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
+      [material_id, name, category, finish, presentation, dimensions, price, quantity, image, status]
+    );
+
+    res.json({ message: 'Material uploaded successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error uploading material' });
   }
 };
