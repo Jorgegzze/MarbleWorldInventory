@@ -1,101 +1,120 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './InventoryPage.css';
+import axios from 'axios';
 
-const materials = [
-  {
-    id: 'M3',
-    name: 'Arabescato',
-    category: 'Piedra Tecnologica',
-    finish: 'Seda/Silk',
-    presentation: 'Placa',
-    dimensions: '3.20 x 1.60 x .12 mm',
-    price: 15200,
-    quantity: 2,
-    status: 'Available',
-    image: 'https://via.placeholder.com/50',
-  },
-  {
-    id: 'M6',
-    name: 'Basaltina',
-    category: 'Piedra Tecnologica',
-    finish: 'Natural',
-    presentation: 'Placa',
-    dimensions: '3.20 x 1.60 x .12 mm',
-    price: 15200,
-    quantity: 12,
-    status: 'Available',
-    image: 'https://via.placeholder.com/50',
-  },
-  {
-    id: 'M4',
-    name: 'Belvedere',
-    category: 'Piedra Tecnologica',
-    finish: 'Seda/Silk',
-    presentation: 'Placa',
-    dimensions: '3.20 x 1.60 x .12 mm',
-    price: 15200,
-    quantity: 0,
-    status: 'Out of stock',
-    image: 'https://via.placeholder.com/50',
-  },
-  {
-    id: 'M5',
-    name: 'Bianco',
-    category: 'Piedra Tecnologica',
-    finish: 'Seda/Silk',
-    presentation: 'Placa',
-    dimensions: '3.20 x 1.60 x .12 mm',
-    price: 15200,
-    quantity: 0,
-    status: 'Out of stock',
-    image: 'https://via.placeholder.com/50',
-  },
-  {
-    id: 'M9',
-    name: 'Borghini',
-    category: 'Piedra Tecnologica',
-    finish: 'Pulido',
-    presentation: 'Placa',
-    dimensions: '3.20 x 1.60 x .12 mm',
-    price: 15200,
-    quantity: 0,
-    status: 'Out of stock',
-    image: 'https://via.placeholder.com/50',
-  },
-];
+const API_BASE_URL = 'https://your-backend-url.onrender.com/inventory';
 
 const InventoryPage = () => {
+  const [materials, setMaterials] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newItem, setNewItem] = useState({
+    image: '',
+    material_id: '',
+    name: '',
+    category: '',
+    finish: '',
+    presentation: '',
+    dimensions: '',
+    price: '',
+    quantity: ''
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = () => {
+    axios.get(API_BASE_URL)
+      .then(res => {
+        const sorted = [...res.data].sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        setMaterials(sorted);
+      })
+      .catch(err => console.error(err));
+  };
+
+  const toggleSelectAll = () => {
+    if (selectAll) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(materials.map(m => m.id));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const toggleSelectItem = (id) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedIds.length === 0) return;
+    axios.delete(API_BASE_URL, { data: { ids: selectedIds } })
+      .then(() => {
+        setMaterials(prev => prev.filter(m => !selectedIds.includes(m.id)));
+        setSelectedIds([]);
+        setSelectAll(false);
+      })
+      .catch(err => console.error(err));
+  };
+
+  const handleDownloadTemplate = () => {
+    window.open('https://marbleworldinventory.replit.app/materials_template.xlsx', '_blank');
+  };
+
+  const handleUploadTemplate = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    axios.post(`${API_BASE_URL}/upload`, formData)
+      .then(() => fetchData())
+      .catch(err => console.error(err));
+  };
+
+  const handleAddNewItem = () => {
+    // Simulate adding via backend
+    const item = { ...newItem, status: newItem.quantity === '0' ? 'Out of Stock' : 'Available' };
+    axios.post(API_BASE_URL, item)
+      .then(() => {
+        fetchData();
+        setShowAddModal(false);
+        setNewItem({ image: '', material_id: '', name: '', category: '', finish: '', presentation: '', dimensions: '', price: '', quantity: '' });
+      })
+      .catch(err => console.error(err));
+  };
+
   return (
     <div className="inventory-page">
       <div className="inventory-header">
         <h2>Materials Management</h2>
         <div className="button-group">
-          <button>⬇️ Download Template</button>
-          <button>⬆️ Upload Materials</button>
-          <button className="add-btn">+ Add New Material</button>
+          <button onClick={handleDownloadTemplate}>⬇️ Download Template</button>
+          <label className="upload-label">
+            ⬆️ Upload Materials
+            <input type="file" onChange={handleUploadTemplate} hidden />
+          </label>
+          <button className="add-btn" onClick={() => setShowAddModal(true)}>+ Add New Material</button>
+          <button onClick={handleDeleteSelected}>🗑 Delete Selected</button>
         </div>
-      </div>
-
-      <div className="filters">
-        {[
-          'Material ID',
-          'Name',
-          'Category',
-          'Finish',
-          'Presentation',
-          'Dimensions',
-          'Price',
-          'Quantity',
-          'Status',
-        ].map((label, i) => (
-          <input key={i} placeholder={`Filter by ${label}`} />
-        ))}
       </div>
 
       <table className="materials-table">
         <thead>
           <tr>
-            <th></th>
+            <th>
+              <input
+                type="checkbox"
+                checked={selectAll}
+                onChange={toggleSelectAll}
+              />
+            </th>
             <th>Image</th>
             <th>Material ID</th>
             <th>Name</th>
@@ -106,15 +125,20 @@ const InventoryPage = () => {
             <th>Price</th>
             <th>Quantity</th>
             <th>Status</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {materials.map((mat, idx) => (
-            <tr key={idx}>
-              <td><input type="checkbox" /></td>
-              <td><img src={mat.image} alt={mat.name} /></td>
-              <td>{mat.id}</td>
+          {materials.map((mat) => (
+            <tr key={mat.id}>
+              <td>
+                <input
+                  type="checkbox"
+                  checked={selectedIds.includes(mat.id)}
+                  onChange={() => toggleSelectItem(mat.id)}
+                />
+              </td>
+              <td><img src={mat.image} alt={mat.name} width="50" /></td>
+              <td>{mat.material_id}</td>
               <td>{mat.name}</td>
               <td>{mat.category}</td>
               <td>{mat.finish}</td>
@@ -127,15 +151,28 @@ const InventoryPage = () => {
                   {mat.status}
                 </span>
               </td>
-              <td className="actions">
-                <button>✏️</button>
-                <button>🗑️</button>
-                <button>💲</button>
-              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {showAddModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Add New Material</h3>
+            {Object.keys(newItem).map((field, index) => (
+              <input
+                key={index}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                value={newItem[field]}
+                onChange={e => setNewItem({ ...newItem, [field]: e.target.value })}
+              />
+            ))}
+            <button onClick={handleAddNewItem}>Add</button>
+            <button onClick={() => setShowAddModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
