@@ -1,0 +1,75 @@
+.inventory-page {
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.button-group button {
+  margin-left: 10px;
+  padding: 8px 12px;
+  border: none;
+  background: #eee;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-btn {
+  background-color: #0d1117;
+  color: white;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filters input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.materials-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.materials-table th,
+.materials-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.materials-table img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.badge-available {
+  color: green;
+  font-weight: bold;
+}
+
+.badge-out {
+  color: red;
+  font-weight: bold;
+}
+
+.actions button {
+  margin-right: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}

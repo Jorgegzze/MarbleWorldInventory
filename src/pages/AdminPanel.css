@@ -1,0 +1,102 @@
+* {
+  box-sizing: border-box;
+}
+
+.admin-container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.sidebar {
+  width: 220px;
+  background-color: #f9f9f9;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.sidebar li.active {
+  background-color: #e5e5e5;
+  font-weight: bold;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 20px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.signout-btn {
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dashboard-cards {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.card p {
+  margin: 0;
+  color: #555;
+}
+
+.card h2 {
+  margin: 8px 0 0;
+}
+
+.category-table {
+  margin-top: 30px;
+}
+
+.category-table h2 {
+  margin-bottom: 10px;
+}
+
+.category-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.category-table th,
+.category-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
