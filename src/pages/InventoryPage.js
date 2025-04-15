@@ -10,7 +10,6 @@ const InventoryPage = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newItem, setNewItem] = useState({
-    image: '',
     material_id: '',
     name: '',
     category: '',
@@ -18,8 +17,9 @@ const InventoryPage = () => {
     presentation: '',
     dimensions: '',
     price: '',
-    quantity: ''
+    quantity: '',
   });
+  const [newImage, setNewImage] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -79,13 +79,23 @@ const InventoryPage = () => {
   };
 
   const handleAddNewItem = () => {
-    // Simulate adding via backend
-    const item = { ...newItem, status: newItem.quantity === '0' ? 'Out of Stock' : 'Available' };
-    axios.post(API_BASE_URL, item)
+    const formData = new FormData();
+    for (const key in newItem) {
+      formData.append(key, newItem[key]);
+    }
+    if (newImage) {
+      formData.append('image', newImage);
+    }
+
+    axios.post(`${API_BASE_URL}/upload-material`, formData)
       .then(() => {
         fetchData();
         setShowAddModal(false);
-        setNewItem({ image: '', material_id: '', name: '', category: '', finish: '', presentation: '', dimensions: '', price: '', quantity: '' });
+        setNewItem({
+          material_id: '', name: '', category: '', finish: '', presentation: '',
+          dimensions: '', price: '', quantity: ''
+        });
+        setNewImage(null);
       })
       .catch(err => console.error(err));
   };
@@ -108,13 +118,7 @@ const InventoryPage = () => {
       <table className="materials-table">
         <thead>
           <tr>
-            <th>
-              <input
-                type="checkbox"
-                checked={selectAll}
-                onChange={toggleSelectAll}
-              />
-            </th>
+            <th><input type="checkbox" checked={selectAll} onChange={toggleSelectAll} /></th>
             <th>Image</th>
             <th>Material ID</th>
             <th>Name</th>
@@ -130,13 +134,7 @@ const InventoryPage = () => {
         <tbody>
           {materials.map((mat) => (
             <tr key={mat.id}>
-              <td>
-                <input
-                  type="checkbox"
-                  checked={selectedIds.includes(mat.id)}
-                  onChange={() => toggleSelectItem(mat.id)}
-                />
-              </td>
+              <td><input type="checkbox" checked={selectedIds.includes(mat.id)} onChange={() => toggleSelectItem(mat.id)} /></td>
               <td><img src={mat.image} alt={mat.name} width="50" /></td>
               <td>{mat.material_id}</td>
               <td>{mat.name}</td>
@@ -146,11 +144,7 @@ const InventoryPage = () => {
               <td>{mat.dimensions}</td>
               <td>{mat.price}</td>
               <td>{mat.quantity}</td>
-              <td>
-                <span className={mat.status === 'Available' ? 'badge-available' : 'badge-out'}>
-                  {mat.status}
-                </span>
-              </td>
+              <td><span className={mat.status === 'Available' ? 'badge-available' : 'badge-out'}>{mat.status}</span></td>
             </tr>
           ))}
         </tbody>
@@ -168,6 +162,7 @@ const InventoryPage = () => {
                 onChange={e => setNewItem({ ...newItem, [field]: e.target.value })}
               />
             ))}
+            <input type="file" onChange={(e) => setNewImage(e.target.files[0])} />
             <button onClick={handleAddNewItem}>Add</button>
             <button onClick={() => setShowAddModal(false)}>Cancel</button>
           </div>
