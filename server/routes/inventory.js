@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const {
   getInventory,
-  uploadInventory,
+  uploadInventory ,
   deleteInventory
 } = require('../controllers/inventoryController');
 
