@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './InventoryPage.css';
 import axios from 'axios';
 
-const API_BASE_URL = 'https://your-backend-url.onrender.com/inventory';
+const API_BASE_URL = https://marbleworldinventory.onrender.com;
 
 const InventoryPage = () => {
   const [materials, setMaterials] = useState([]);
