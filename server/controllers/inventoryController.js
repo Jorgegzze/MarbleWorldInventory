@@ -20,10 +20,13 @@ exports.getInventory = async (req, res) => {
 
 exports.uploadInventory = async (req, res) => {
   try {
+    console.log('FILE RECEIVED:', req.file);
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
     const filePath = path.join(__dirname, '..', req.file.path);
     const workbook = xlsx.readFile(filePath);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const data = xlsx.utils.sheet_to_json(sheet, { defval: '' }); // row 1 is header
+    const data = xlsx.utils.sheet_to_json(sheet, { defval: '' });
 
     for (const row of data) {
       const {
@@ -46,7 +49,7 @@ exports.uploadInventory = async (req, res) => {
       );
     }
 
-    fs.unlinkSync(filePath); // cleanup
+    fs.unlinkSync(filePath);
     res.json({ message: 'Inventory uploaded successfully' });
   } catch (error) {
     console.error(error);
