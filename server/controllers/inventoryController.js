@@ -23,7 +23,7 @@ exports.uploadInventory = async (req, res) => {
     const filePath = path.join(__dirname, '..', req.file.path);
     const workbook = xlsx.readFile(filePath);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const data = xlsx.utils.sheet_to_json(sheet, { defval: '' }); // row 1 = headers
+    const data = xlsx.utils.sheet_to_json(sheet, { defval: '' }); // row 1 is header
 
     for (const row of data) {
       const {
@@ -49,6 +49,7 @@ exports.uploadInventory = async (req, res) => {
     fs.unlinkSync(filePath); // cleanup
     res.json({ message: 'Inventory uploaded successfully' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Error uploading inventory' });
   }
 };
