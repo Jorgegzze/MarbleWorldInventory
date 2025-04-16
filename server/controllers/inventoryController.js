@@ -1,98 +1,101 @@
 
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const xlsx = require('xlsx');
-const { Pool } = require('pg');
+const pool = require('../db');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
-
+// Get inventory
 exports.getInventory = async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM inventory ORDER BY name ASC');
+    const result = await pool.query('SELECT * FROM inventory');
     res.json(result.rows);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching inventory' });
+  } catch (err) {
+    console.error('Get inventory error:', err);
+    res.status(500).send('Server error');
   }
 };
 
+// Upload Excel file
 exports.uploadInventory = async (req, res) => {
+  if (!req.file) return res.status(400).send('No file uploaded');
+
+  const workbook = xlsx.readFile(req.file.path);
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = xlsx.utils.sheet_to_json(sheet, { defval: '' });
+
+  console.log('Parsed Excel Rows:', rows);
+  if (rows.length === 0) return res.status(400).send('Excel file is empty');
+
   try {
-    console.log('FILE RECEIVED:', req.file);
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-
-    const filePath = path.join(__dirname, '..', req.file.path);
-    const workbook = xlsx.readFile(filePath);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const data = xlsx.utils.sheet_to_json(sheet, { defval: '' });
-
-    for (const row of data) {
+    for (const row of rows) {
       const {
         'Material ID': material_id,
-        Name: name,
-        Category: category,
-        Finish: finish,
-        Presentation: presentation,
-        Dimensions: dimensions,
-        Price: price,
-        Quantity: quantity,
-        Image: image
+        'Name': name,
+        'Category': category,
+        'Finish': finish,
+        'Presentation': presentation,
+        'Dimensions': dimensions,
+        'Price': price,
+        'Quantity': quantity,
+        'Image': image
       } = row;
 
-      const status = parseInt(quantity) === 0 ? 'Out of Stock' : 'Available';
+      const status = quantity > 0 ? 'Available' : 'Out of Stock';
 
       await pool.query(
         'INSERT INTO inventory (material_id, name, category, finish, presentation, dimensions, price, quantity, image, status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
-        [material_id, name, category, finish, presentation, dimensions, price, quantity, image, status]
+        [material_id, name, category, finish, presentation, dimensions, price, quantity, image || '', status]
       );
     }
 
-    fs.unlinkSync(filePath);
-    res.json({ message: 'Inventory uploaded successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error uploading inventory' });
+    res.send('Inventory uploaded successfully!');
+  } catch (err) {
+    console.error('Upload Inventory Error:', err);
+    res.status(500).send('Upload failed');
+  } finally {
+    fs.unlinkSync(req.file.path);
   }
 };
 
-exports.deleteInventory = async (req, res) => {
-  try {
-    const ids = req.body.ids;
-    if (!Array.isArray(ids)) return res.status(400).json({ error: 'Invalid data' });
-
-    await pool.query('DELETE FROM inventory WHERE id = ANY($1)', [ids]);
-    res.json({ message: 'Items deleted' });
-  } catch (error) {
-    res.status(500).json({ error: 'Error deleting inventory' });
-  }
-};
-
+// Upload single material
 exports.uploadSingleMaterial = async (req, res) => {
+  const {
+    material_id,
+    name,
+    category,
+    finish,
+    presentation,
+    dimensions,
+    price,
+    quantity
+  } = req.body;
+
+  const filePath = req.file ? '/uploads/' + req.file.filename : '';
+  const status = quantity > 0 ? 'Available' : 'Out of Stock';
+
   try {
-    const {
-      material_id,
-      name,
-      category,
-      finish,
-      presentation,
-      dimensions,
-      price,
-      quantity
-    } = req.body;
-
-    const image = req.file ? `/uploads/${req.file.filename}` : '';
-    const status = parseInt(quantity) === 0 ? 'Out of Stock' : 'Available';
-
     await pool.query(
       'INSERT INTO inventory (material_id, name, category, finish, presentation, dimensions, price, quantity, image, status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
-      [material_id, name, category, finish, presentation, dimensions, price, quantity, image, status]
+      [material_id, name, category, finish, presentation, dimensions, price, quantity, filePath, status]
     );
 
-    res.json({ message: 'Material uploaded successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error uploading material' });
+    res.send('Material uploaded successfully');
+  } catch (err) {
+    console.error('Upload Single Material Error:', err);
+    res.status(500).send('Upload failed');
+  }
+};
+
+// Delete materials
+exports.deleteMaterials = async (req, res) => {
+  const { ids } = req.body;
+  if (!ids || !ids.length) return res.status(400).send('No IDs provided');
+
+  try {
+    await pool.query('DELETE FROM inventory WHERE id = ANY($1::int[])', [ids]);
+    res.send('Materials deleted successfully');
+  } catch (err) {
+    console.error('Delete error:', err);
+    res.status(500).send('Delete failed');
   }
 };
