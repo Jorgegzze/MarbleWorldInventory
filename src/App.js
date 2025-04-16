@@ -4,6 +4,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import AdminPanel from './pages/AdminPanel';
 import InventoryPage from './pages/InventoryPage';
 import HomePage from './pages/HomePage';
+import ReservedItemsPage from './pages/ReservedItemsPage';
+import UsersPage from './pages/UsersPage';
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,6 +42,23 @@ function App() {
           path="/inventory"
           element={isAuthenticated ? (
             <InventoryPage />
+          ) : (
+            <Navigate to="/" />
+          )}
+        />
+
+        <Route
+          path="/reserved"
+          element={isAuthenticated ? (
+            <ReservedItemsPage />
+          ) : (
+            <Navigate to="/" />
+          )}
+        />
+        <Route
+          path="/users"
+          element={isAuthenticated ? (
+            <UsersPage />
           ) : (
             <Navigate to="/" />
           )}
