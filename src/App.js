@@ -1,30 +1,18 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import HomePage from './pages/HomePage';
+
+// App.js with forced access to admin panel (no login)
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AdminPanel from './pages/AdminPanel';
+import InventoryPage from './pages/InventoryPage';
+import HomePage from './pages/HomePage';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <HomePage setIsAuthenticated={setIsAuthenticated} />
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            isAuthenticated ? (
-              <AdminPanel />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/inventory" element={<InventoryPage />} />
       </Routes>
     </Router>
   );
