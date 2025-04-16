@@ -140,7 +140,17 @@ const InventoryPage = () => {
           {materials.map((mat) => (
             <tr key={mat.id}>
               <td><input type="checkbox" checked={selectedIds.includes(mat.id)} onChange={() => toggleSelectItem(mat.id)} /></td>
-              <td><img src={mat.image} alt={mat.name} width="50" /></td>
+              <td>
+                <img
+                  src={
+                    mat.image?.startsWith('http')
+                      ? mat.image
+                      : `https://marbleworldinventory.onrender.com${mat.image}`
+                  }
+                  alt={mat.name}
+                  width="50"
+                />
+              </td>
               <td>{mat.material_id}</td>
               <td>{mat.name}</td>
               <td>{mat.category}</td>
