@@ -1,11 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './InventoryPage.css';
 import axios from 'axios';
 
 const API_BASE_URL = 'https://marbleworldinventory.onrender.com/inventory';
 
 const InventoryPage = () => {
+  const navigate = useNavigate();
   const [materials, setMaterials] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -108,6 +110,7 @@ const InventoryPage = () => {
   return (
     <div className="inventory-page">
       <div className="inventory-header">
+        <button onClick={() => navigate('/')}>🏠 Home</button>
         <h2>Materials Management</h2>
         <div className="button-group">
           <button onClick={handleDownloadTemplate}>⬇️ Download Template</button>
