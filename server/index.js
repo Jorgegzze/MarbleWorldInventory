@@ -2,24 +2,22 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+
 const inventoryRoutes = require('./routes/inventory');
-require('dotenv').config();
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // added this line
 
-app.use('/inventory', inventoryRoutes);
+const uploadRoutes = require('./routes/upload');
 
-app.get('/', (req, res) => {
-  res.send('MarbleWorldInventory API is running.');
-});
+// ROUTES
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api', uploadRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

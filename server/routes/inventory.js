@@ -1,26 +1,18 @@
-
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
-const controller = require('../controllers/inventoryController');
+const upload = require('../middleware/upload');
+const inventoryController = require('../controllers/inventoryController');
 
-// Configure Multer storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../uploads'));
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
+// Upload inventory Excel file
+router.post('/upload', upload.single('file'), inventoryController.uploadInventory);
 
-const upload = multer({ storage });
+// Get all materials
+router.get('/', inventoryController.getAllInventory);
 
-// Routes
-router.get('/', controller.getInventory);
-router.post('/upload', upload.single('file'), controller.uploadInventory);
-router.post('/upload-material', upload.single('image'), controller.uploadSingleMaterial);
-router.delete('/', controller.deleteMaterials);
+// Add new material
+router.post('/', inventoryController.addMaterial);
+
+// Delete selected materials
+router.delete('/', inventoryController.deleteMaterials);
 
 module.exports = router;

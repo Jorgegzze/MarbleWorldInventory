@@ -1,8 +1,28 @@
+
 .footer {
-  background-color: #f1f1f1;
-  padding: 1rem;
-  text-align: center;
-  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  padding: 30px 40px;
+  background-color: #f7f7f7;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 14px;
   color: #333;
-  margin-top: 2rem;
+  border-top: 1px solid #ddd;
+  flex-wrap: wrap;
+}
+
+.footer-left, .footer-center, .footer-right {
+  flex: 1;
+  min-width: 200px;
+  margin: 10px 20px;
+}
+
+.footer a {
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.footer i {
+  margin-right: 8px;
 }

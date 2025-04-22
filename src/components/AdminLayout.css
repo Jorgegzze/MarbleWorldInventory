@@ -1,0 +1,154 @@
+
+/* Global */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Top bar */
+.top-bar-admin {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid #ddd;
+  background-color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.nav-title {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.nav-label {
+  color: #666;
+}
+
+/* Layout body */
+.admin-body {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-right: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar button {
+  padding: 10px;
+  text-align: left;
+  border: none;
+  background-color: transparent;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.sidebar button.active,
+.sidebar button:hover {
+  background-color: #e4e4e4;
+  border-radius: 6px;
+}
+
+.signout-btn {
+  margin-top: auto;
+  font-weight: bold;
+}
+
+/* Content */
+.main-content {
+  flex: 1;
+  padding: 40px;
+}
+
+/* Dashboard Cards */
+.dashboard-cards {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.card {
+  flex: 1;
+  background-color: #f9f9f9;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.card strong {
+  font-size: 20px;
+  display: block;
+  margin-top: 8px;
+}
+
+/* Tables */
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.status.available {
+  background-color: #e7fbe9;
+  color: #38a169;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.status.reserved {
+  background-color: #fff6cc;
+  color: #a18700;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* Titles */
+.page-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.section-title {
+  font-size: 18px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+/* Button Actions */
+.actions,
+.users-actions {
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+}
+
+.primary-btn {
+  background-color: #000;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
